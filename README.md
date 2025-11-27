@@ -81,11 +81,6 @@ docker run --rm -v %cd%/res:/app/res cdmo-project python3 solution_checker.py re
 docker run --rm -v %cd%/res:/app/res cdmo-project python3 solution_checker.py res/MIP
 ```
 
-### Check All
-```bash
-docker run --rm -v ${PWD}/res:/app/res cdmo-project bash -c "python3 solution_checker.py res/CP && python3 solution_checker.py res/SMT && python3 solution_checker.py res/MIP"
-```
-
 ## Results Format
 - `res/CP/6.json`, `res/CP/8.json`, `res/CP/10.json`
 - `res/SMT/6.json`, `res/SMT/8.json`, `res/SMT/10.json`

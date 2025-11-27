@@ -1,0 +1,49 @@
+Analysis & Observations
+1. Performance Comparison Summary
+
+Approach	n=6	n=8	n=10	Success Rate
+CP (Gecode default)	0s	0s	0s	100%
+CP (Gecode fail_first)	0s	28s	4s	100%
+CP (Gecode dom_w_deg)	0s	0s	10s	100%
+CP (Gecode most_constrained)	0s	0s	22s	100%
+CP (Chuffed default)	0s	1s	TIMEOUT	66%
+CP (Chuffed fail_first)	0s	0s	6s	100%
+SMT (Z3)	0s	0s	7s	100%
+MIP (PuLP CBC)	0s	2s	TIMEOUT	66%
+
+2. Key Observations
+Scalability:
+The problem exhibits exponential complexity growth. While n=6 is trivially solved by all approaches (<1s), n=10 already causes timeouts for MIP and Chuffed default
+CP with Gecode demonstrates the best scalability, with the default search strategy solving n=10 instantly
+Search Strategy Impact (CP):
+Search strategy choice has dramatic effects: Gecode's fail_first_indomain_min took 28s for n=8 but only 4s for n=10 - showing non-monotonic behavior due to randomness/problem structure
+The dom_w_deg (domain over weighted degree) strategy shows good performance by focusing on heavily constrained variables
+Chuffed default failed at n=10 (300s timeout) while fail_first_indomain_random succeeded in 6s - demonstrating that search heuristics are critical
+Solver Comparison:
+SMT (Z3) provides consistent, predictable performance across all instances with 100% success rate
+MIP (PuLP CBC) struggles with larger instances due to the linearization overhead - the auxiliary variables needed to model team pairings (m1, m2 variables in the code) significantly increase the problem size
+CP is the most natural paradigm for this scheduling problem due to native support for alldifferent and global_cardinality constraints
+
+3. Model Complexity Analysis
+
+Paradigm	Variables (n=10)	Constraint Style
+CP	~135 integer variables	Declarative global constraints
+SMT	~90 integer variables + Boolean auxiliaries	Sequential encoding for cardinality
+MIP	~450+ binary variables (4D array + auxiliary)	Linearized quadratic constraints
+
+The MIP formulation requires 4-5x more variables than CP/SMT due to:
+Binary encoding of team assignments
+Auxiliary variables (m1, m2) to linearize the "team plays each other exactly once" constraint
+
+4. Constraint Modeling Differences
+Each-pair-once constraint:
+CP: Elegant boolean sum with /\ and \/ operators
+SMT: Sequential encoding using auxiliary Boolean variables
+MIP: Requires linearization with additional binary variables and 3 constraints per auxiliary
+
+5. Conclusions
+CP is optimal for this tournament scheduling problem - native global constraints (alldifferent, global_cardinality_low_up) map directly to the problem structure
+Search strategy matters more than solver choice - a poorly chosen heuristic can cause timeout even with an efficient solver (Chuffed default vs. fail_first)
+SMT provides robustness - Z3's internal heuristics found solutions consistently without manual strategy tuning
+MIP's linearization overhead becomes prohibitive - the quadratic nature of the "each team plays each other once" constraint fundamentally disadvantages MIP approaches
+Symmetry breaking is implemented in all models (home team < away team for first week) and helps reduce search space

@@ -1,6 +1,6 @@
 {
   "pulp_cbc": {
-    "time": 3,
+    "time": 2,
     "optimal": true,
     "obj": null,
     "sol": [
