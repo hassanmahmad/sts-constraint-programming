@@ -1,4 +1,4 @@
-# CDMO Project - Sports Tournament Scheduling
+# Sports Tournament Scheduling - Constraint Programming
 The Sports tournament scheduling problem requires arranging n even teams so that each team plays every other team exactly once over W = n − 1 weeks. Each week contains P = n/2 periods. The challenge is to compute a feasible schedule satisfying structural fairness and operational constraints.
 
 Practical constraints imposed include:
